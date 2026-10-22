@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Study Planner</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-700 text-white p-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"> Study Planner</h1>
+            <span class="text-sm">Student Dashboard</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto p-4">
+
+        <!-- Header -->
+        <section class="bg-white rounded-xl shadow p-6 mt-4">
+            <h2 class="text-2xl font-bold text-gray-800">
+                Plan Your Study
+            </h2>
+
+            <p class="text-gray-500 mt-1">
+                Add and manage your daily study tasks easily.
+            </p>
+
+            <!-- Input Area -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
+
+                <input
+                    type="text"
+                    id="taskInput"
+                    placeholder="Enter study task"
+                    class="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+
+                <select
+                    id="subjectInput"
+                    class="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                    <option value="Web Development">Web Development</option>
+                    <option value="Java">Java</option>
+                    <option value="C++">C++</option>
+                    <option value="Database">Database</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <button
+                    onclick="addTask()"
+                    class="bg-indigo-600 text-white rounded-lg p-3 hover:bg-indigo-700 transition"
+                >
+                    + Add Task
+                </button>
+
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="grid grid-cols-2 gap-4 mt-5">
+
+            <div class="bg-white rounded-xl shadow p-5 text-center">
+                <p class="text-gray-500">Total Tasks</p>
+                <p id="totalTasks" class="text-3xl font-bold text-indigo-600">
+                    0
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow p-5 text-center">
+                <p class="text-gray-500">Completed</p>
+                <p id="completedTasks" class="text-3xl font-bold text-green-600">
+                    0
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Task List -->
+        <section class="bg-white rounded-xl shadow p-6 mt-5">
+
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                📋 My Study Tasks
+            </h2>
+
+            <div id="taskList" class="space-y-3">
+
+                <p id="emptyMessage" class="text-center text-gray-400">
+                    No tasks added yet.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-500 text-sm p-5">
+        Student Study Planner | HTML + Tailwind CSS + JavaScript
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script>
+
+        let tasks = [];
+
+        function addTask() {
+
+            const taskInput = document.getElementById("taskInput");
+            const subjectInput = document.getElementById("subjectInput");
+
+            const taskName = taskInput.value.trim();
+            const subject = subjectInput.value;
+
+            if (taskName === "") {
+                alert("Please enter a study task.");
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                name: taskName,
+                subject: subject,
+                completed: false
+            };
+
+            tasks.push(task);
+
+            taskInput.value = "";
+
+            displayTasks();
+        }
+
+
+        function displayTasks() {
+
+            const taskList = document.getElementById("taskList");
+            const emptyMessage = document.getElementById("emptyMessage");
+
+            taskList.innerHTML = "";
+
+            if (tasks.length === 0) {
+
+                taskList.innerHTML = `
+                    <p class="text-center text-gray-400">
+                        No tasks added yet.
+                    </p>
+                `;
+
+            } else {
+
+                tasks.forEach(task => {
+
+                    const taskElement = document.createElement("div");
+
+                    taskElement.className =
+                        "flex flex-col sm:flex-row sm:items-center " +
+                        "justify-between gap-3 border rounded-lg p-4";
+
+                    taskElement.innerHTML = `
+
+                        <div>
+                            <h3 class="font-semibold ${
+                                task.completed
+                                ? "line-through text-gray-400"
+                                : "text-gray-800"
+                            }">
+                                ${task.name}
+                            </h3>
+
+                            <p class="text-sm text-indigo-500">
+                                ${task.subject}
+                            </p>
+                        </div>
+
+                        <div class="flex gap-2">
+
+                            <button
+                                onclick="completeTask(${task.id})"
+                                class="px-3 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200"
+                            >
+                                ${task.completed ? "Undo" : "Complete"}
+                            </button>
+
+                            <button
+                                onclick="deleteTask(${task.id})"
+                                class="px-3 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+                    `;
+
+                    taskList.appendChild(taskElement);
+                });
+            }
+
+            updateStatistics();
+        }
+
+
+        function completeTask(id) {
+
+            tasks = tasks.map(task => {
+
+                if (task.id === id) {
+                    task.completed = !task.completed;
+                }
+
+                return task;
+            });
+
+            displayTasks();
+        }
+
+
+        function deleteTask(id) {
+
+            tasks = tasks.filter(task => task.id !== id);
+
+            displayTasks();
+        }
+
+
+        function updateStatistics() {
+
+            document.getElementById("totalTasks").textContent =
+                tasks.length;
+
+            const completed = tasks.filter(
+                task => task.completed
+            ).length;
+
+            document.getElementById("completedTasks").textContent =
+                completed;
+        }
+
+    </script>
+
+</body>
+</html>
